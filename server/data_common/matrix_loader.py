@@ -4,10 +4,12 @@ from server.common.utils.data_locator import DataLocator
 from server.common.errors import DatasetAccessError
 from http import HTTPStatus
 
-
 class MatrixDataType(Enum):
     H5AD = "h5ad"
+    # add muon data
+    H5MU = "h5mu"
     UNKNOWN = "unknown"
+
 
 
 class MatrixDataLoader(object):
@@ -34,9 +36,18 @@ class MatrixDataLoader(object):
 
             self.matrix_type = AnndataAdaptor
 
+        if self.matrix_data_type is MatrixDataType.H5MU:
+            # print(self.matrix_data_type)
+            from server.data_anndata.muon_adaptor import MuonAdaptor
+
+            self.matrix_type = MuonAdaptor
+            print(self.matrix_type)
+
     def __matrix_data_type(self):
         if self.location.path.endswith(".h5ad"):
             return MatrixDataType.H5AD
+        elif self.location.path.endswith(".h5mu"):
+            return MatrixDataType.H5MU
         else:
             return MatrixDataType.UNKNOWN
 

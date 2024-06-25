@@ -336,7 +336,7 @@ def launch(
 
     Examples:
 
-    > cellxgene launch example-dataset/pbmc3k.h5ad --title pbmc3k
+    > cellxgene launch dataset/pbmc3k.h5ad --title pbmc3k
 
     > cellxgene launch <your data file> --title <your title>
 

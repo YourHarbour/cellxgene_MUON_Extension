@@ -283,7 +283,9 @@ def diffexp_obs_post(request, data_adaptor):
 
 def layout_obs_get(request, data_adaptor):
     fields = request.args.getlist("layout-name", None)
+    print(fields)
     num_columns_requested = len(data_adaptor.get_embedding_names()) if len(fields) == 0 else len(fields)
+    print(num_columns_requested)
     if data_adaptor.server_config.exceeds_limit("column_request_max", num_columns_requested):
         return abort(HTTPStatus.BAD_REQUEST)
 

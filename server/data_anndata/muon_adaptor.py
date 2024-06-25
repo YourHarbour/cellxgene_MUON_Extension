@@ -1,40 +1,29 @@
-import warnings
-
 import anndata
 import numpy as np
-from packaging import version
+import muon as mu
 from pandas.core.dtypes.dtypes import CategoricalDtype
 from scipy import sparse
+import warnings
 
 import server.common.compute.diffexp_generic as diffexp_generic
 import server.common.compute.estimate_distribution as estimate_distribution
 from server.common.colors import convert_anndata_category_colors_to_cxg_category_colors
 from server.common.constants import Axis, MAX_LAYOUTS, XApproximateDistribution
-from server.common.corpora import corpora_get_props_from_anndata
 from server.common.errors import PrepareError, DatasetAccessError
 from server.common.utils.type_conversion_utils import get_schema_type_hint_of_array
 from server.data_common.data_adaptor import DataAdaptor
 from server.common.fbs.matrix import encode_matrix_fbs
 
-anndata_version = version.parse(str(anndata.__version__)).release
 
+class MuonAdaptor(DataAdaptor):
 
-def anndata_version_is_pre_070():
-    major = anndata_version[0]
-    minor = anndata_version[1] if len(anndata_version) > 1 else 0
-    return major == 0 and minor < 7
-
-
-class AnndataAdaptor(DataAdaptor):
     def __init__(self, data_locator, app_config=None, dataset_config=None):
         super().__init__(data_locator, app_config, dataset_config)
         self.data = None
+        self.whole_data = None
         self.X_approximate_distribution = None
         self._load_data(data_locator)
         self._validate_and_initialize()
-
-    def cleanup(self):
-        pass
 
     @staticmethod
     def pre_load_validation(data_locator):
@@ -54,14 +43,13 @@ class AnndataAdaptor(DataAdaptor):
 
     @staticmethod
     def open(data_locator, app_config, dataset_config=None):
-        return AnndataAdaptor(data_locator, app_config, dataset_config)
+        return MuonAdaptor(data_locator, app_config, dataset_config)
 
     def get_corpora_props(self):
-        # print(corpora_get_props_from_anndata(self.data))
-        return corpora_get_props_from_anndata(self.data)
+        return None
 
     def get_name(self):
-        return "cellxgene anndata adaptor version"
+        return "Muon Adaptor"
 
     def get_library_versions(self):
         return dict(anndata=str(anndata.__version__))
@@ -151,6 +139,26 @@ class AnndataAdaptor(DataAdaptor):
     def get_schema(self):
         return self.schema
 
+    def _merge_muon_data(self, atac, gex):
+        gex.obs = gex.obs.add_suffix('_gex')
+        atac.obs = atac.obs.add_suffix('_atac')
+
+        gex.obsm = {f"{key}_gex": value for key, value in gex.obsm.items()}
+        atac.obsm = {f"{key}_atac": value for key, value in atac.obsm.items()}
+
+        gex.uns = {f"{key}_gex": value for key, value in gex.uns.items()}
+        atac.uns = {f"{key}_atac": value for key, value in atac.uns.items()}
+
+        assert np.array_equal(gex.obs_names, atac.obs_names)
+
+        merged = gex.copy()
+        merged.obsm.update(atac.obsm)
+
+        # 合并 obs
+        for col in atac.obs.columns:
+            merged.obs[col] = atac.obs[col]
+
+        self.data = merged
     def _load_data(self, data_locator):
         # as of AnnData 0.6.19, backed mode performs initial load fast, but at the
         # cost of significantly slower access to X data.
@@ -162,7 +170,9 @@ class AnndataAdaptor(DataAdaptor):
                 # as of AnnData 0.6.19, backed mode performs initial load fast, but at the
                 # cost of significantly slower access to X data.
                 backed = "r" if self.server_config.adaptor__anndata_adaptor__backed else None
-                self.data = anndata.read_h5ad(lh, backed=backed)
+                # self.data = anndata.read_h5ad(lh, backed=backed)
+                self.whole_data = mu.read(lh, backed=backed)
+                self._merge_muon_data(self.whole_data.mod['atac'], self.whole_data.mod['rna'])
 
         except ValueError:
             raise DatasetAccessError(
@@ -185,12 +195,8 @@ class AnndataAdaptor(DataAdaptor):
                 message += f"\n{traceback.format_exc()}"
             raise DatasetAccessError(message)
 
+
     def _validate_and_initialize(self):
-        if anndata_version_is_pre_070():
-            warnings.warn(
-                "Use of anndata versions older than 0.7 will have serious issues. Please update to at "
-                "least anndata 0.7 or later."
-            )
 
         # var and obs column names must be unique
         if not self.data.obs.columns.is_unique or not self.data.var.columns.is_unique:
@@ -277,28 +283,15 @@ class AnndataAdaptor(DataAdaptor):
                             f"annotations with more than 500 categories in the UI"
                         )
 
-    def annotation_to_fbs_matrix(self, axis, fields=None, labels=None):
-        if axis == Axis.OBS:
-            if labels is not None and not labels.empty:
-                df = self.data.obs.join(labels, self.parameters.get("obs_names"))
-            else:
-                df = self.data.obs
-        else:
-            df = self.data.var
-
-        if fields is not None and len(fields) > 0:
-            df = df[fields]
-        return encode_matrix_fbs(df, col_idx=df.columns)
-
     def get_embedding_names(self):
         """
-        Return pre-computed embeddings.
+                Return pre-computed embeddings.
 
-        function:
-            a) generate list of default layouts
-            b) validate layouts are legal.  remove/warn on any that are not
-            c) cap total list of layouts at global const MAX_LAYOUTS
-        """
+                function:
+                    a) generate list of default layouts
+                    b) validate layouts are legal.  remove/warn on any that are not
+                    c) cap total list of layouts at global const MAX_LAYOUTS
+                """
         # load default layouts from the data.
         layouts = self.dataset_config.embeddings__names
 
@@ -327,19 +320,7 @@ class AnndataAdaptor(DataAdaptor):
         full_embedding = self.data.obsm[f"X_{ename}"]
         return full_embedding[:, 0:dims]
 
-    def compute_diffexp_ttest(self, maskA, maskB, top_n=None, lfc_cutoff=None):
-        if top_n is None:
-            top_n = self.dataset_config.diffexp__top_n
-        if lfc_cutoff is None:
-            lfc_cutoff = self.dataset_config.diffexp__lfc_cutoff
-        return diffexp_generic.diffexp_ttest(self, maskA, maskB, top_n, lfc_cutoff)
-
-    def get_colors(self):
-        return convert_anndata_category_colors_to_cxg_category_colors(self.data)
-
     def get_X_array(self, obs_mask=None, var_mask=None):
-        # H5Py does not support boolean indexing (masks), so convert to integer indexing
-        # when backed (ie, when AnnData is using H5Py indexing)
         if obs_mask is None:
             obs_mask = slice(None)
         elif self.data.isbacked and obs_mask.dtype == bool:
@@ -360,7 +341,6 @@ class AnndataAdaptor(DataAdaptor):
             self.X_approximate_distribution = estimate_distribution.estimate_approximate_distribution(self.data.X)
 
         return self.X_approximate_distribution
-
     def get_shape(self):
         return self.data.shape
 
@@ -369,6 +349,9 @@ class AnndataAdaptor(DataAdaptor):
 
     def query_obs_array(self, term_name):
         return getattr(self.data.obs, term_name)
+
+    def get_colors(self):
+        return convert_anndata_category_colors_to_cxg_category_colors(self.data)
 
     def get_obs_index(self):
         name = self.server_config.single_dataset__obs_names
@@ -381,9 +364,31 @@ class AnndataAdaptor(DataAdaptor):
         return self.data.obs.columns
 
     def get_obs_keys(self):
-        # return list of keys
         return self.data.obs.keys().to_list()
 
     def get_var_keys(self):
-        # return list of keys
         return self.data.var.keys().to_list()
+
+    def cleanup(self):
+        pass
+
+
+    def annotation_to_fbs_matrix(self, axis, fields=None, labels=None):
+        if axis == Axis.OBS:
+            if labels is not None and not labels.empty:
+                df = self.data.obs.join(labels, self.parameters.get("obs_names"))
+            else:
+                df = self.data.obs
+        else:
+            df = self.data.var
+
+        if fields is not None and len(fields) > 0:
+            df = df[fields]
+        return encode_matrix_fbs(df, col_idx=df.columns)
+
+    def compute_diffexp_ttest(self, maskA, maskB, top_n, lfc_cutoff):
+        if top_n is None:
+            top_n = self.dataset_config.diffexp__top_n
+        if lfc_cutoff is None:
+            lfc_cutoff = self.dataset_config.diffexp__lfc_cutoff
+        return diffexp_generic.diffexp_ttest(self, maskA, maskB, top_n, lfc_cutoff)

@@ -13,7 +13,7 @@ class DataLoadAdaptorTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.data_file = DataLocator(f"{PROJECT_ROOT}/example-dataset/pbmc3k.h5ad")
+        self.data_file = DataLocator(f"{PROJECT_ROOT}/dataset/pbmc3k.h5ad")
         config = AppConfig()
         config.update_server_config(single_dataset__datapath=self.data_file.path)
         config.update_server_config(app__flask_secret_key="secret")
@@ -64,7 +64,7 @@ class DataLocatorAdaptorTest(unittest.TestCase):
         self.assertEqual(data.gene_count, 1838)
 
     def test_posix_file(self):
-        locator = DataLocator("example-dataset/pbmc3k.h5ad")
+        locator = DataLocator("dataset/pbmc3k.h5ad")
         config = self.get_basic_config()
         config.update_server_config(single_dataset__datapath=locator.path)
         config.complete_config()
