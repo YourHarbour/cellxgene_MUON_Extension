@@ -98,6 +98,15 @@ def get_atac_tracks_2():
     # atac_track_path = "../../" + app_config.get_atac_track_config()
     return send_file('data.bw')
 
+@webbp.route("/get_atac_tracks_u", methods=["GET"])
+def get_atac_tracks_u():
+    file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '../../app/data.bw'
+    # print(file_dir)
+    # app_config = current_app.app_config
+    # atac_track_path = "../../" + app_config.get_atac_track_config()
+    return send_file(file_dir)
+
+
 @webbp.errorhandler(RequestException)
 def handle_request_exception(error):
     return common_rest.abort_and_log(error.status_code, error.message, loglevel=logging.INFO, include_exc_info=True)
