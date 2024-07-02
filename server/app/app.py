@@ -100,7 +100,7 @@ def get_atac_tracks_2():
 
 @webbp.route("/get_atac_tracks_u", methods=["GET"])
 def get_atac_tracks_u():
-    file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '../../app/data.bw'
+    file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '/data.bw'
     # print(file_dir)
     # app_config = current_app.app_config
     # atac_track_path = "../../" + app_config.get_atac_track_config()
