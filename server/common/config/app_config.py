@@ -67,7 +67,7 @@ class AppConfig(object):
 
     def update_atac_track_config_u(self, path):
         source_dir = path
-        dest_dir = os.path.abspath(os.getcwd()) + '/data.bw'
+        dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '/data.bw'
         print(source_dir)
         print(dest_dir)
         cmd = "cp %s %s" % (source_dir, dest_dir)
