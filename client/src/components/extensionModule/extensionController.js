@@ -11,7 +11,7 @@ const ExtensionController = (props) => {
 
     useEffect(() => {
         if (props.config.atac_track !== 'None'){
-            setATACTrack(true)
+            setATACTrack(false)
         }
     }, []);
 
