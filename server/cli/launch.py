@@ -400,7 +400,8 @@ def launch(
         changes = {key: val for key, val, _ in diff}
         app_config.update_dataset_config(**changes)
 
-        app_config.update_atac_track_config(atac_track)
+        #app_config.update_atac_track_config(atac_track)
+        app_config.update_atac_track_config_u(atac_track)
 
         # process the configuration
         #  any errors will be thrown as an exception.
