@@ -1,6 +1,6 @@
 import yaml
 from flatten_dict import unflatten
-
+import os
 from server.default_config import get_default_config
 from server.common.config.dataset_config import DatasetConfig
 from server.common.config.server_config import ServerConfig
@@ -59,7 +59,11 @@ class AppConfig(object):
         self.is_complete = False
 
     def update_atac_track_config(self, path):
-        self.atac_track_config = path
+        source_dir = path
+        dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + 'data.bw'
+        cmd = "cp %s %s" % (source_dir, dest_dir)
+        os.system(cmd)
+        self.atac_track_config = 'data.bw'
 
     def update_single_config_from_path_and_value(self, path, value):
         """Update a single config parameter with the value.

@@ -1,7 +1,7 @@
 import datetime
 import logging
 from functools import wraps
-
+import os
 from flask import (
     Flask,
     current_app,
@@ -76,9 +76,27 @@ def dataset_index():
 
 @webbp.route("/get_atac_tracks", methods=["GET"])
 def get_atac_tracks():
+    file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+    print(file_dir)
     app_config = current_app.app_config
     atac_track_path = "../../" + app_config.get_atac_track_config()
     return send_file(atac_track_path)
+
+@webbp.route("/get_atac_tracks_1", methods=["GET"])
+def get_atac_tracks_1():
+    file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '/data.bw'
+    print(file_dir)
+    # app_config = current_app.app_config
+    # atac_track_path = "../../" + app_config.get_atac_track_config()
+    return send_file(file_dir)
+
+@webbp.route("/get_atac_tracks_2", methods=["GET"])
+def get_atac_tracks_2():
+    # file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + 'data.bw'
+    # print(file_dir)
+    # app_config = current_app.app_config
+    # atac_track_path = "../../" + app_config.get_atac_track_config()
+    return send_file('data.bw')
 
 @webbp.errorhandler(RequestException)
 def handle_request_exception(error):
