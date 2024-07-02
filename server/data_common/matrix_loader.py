@@ -17,6 +17,7 @@ class MatrixDataLoader(object):
         """location can be a string or DataLocator"""
         region_name = None if app_config is None else app_config.server_config.data_locator__s3__region_name
         self.location = DataLocator(location, region_name=region_name)
+        # print(location)
         if not self.location.exists():
             raise DatasetAccessError("Dataset does not exist.", HTTPStatus.NOT_FOUND)
 
@@ -41,7 +42,7 @@ class MatrixDataLoader(object):
             from server.data_anndata.muon_adaptor import MuonAdaptor
 
             self.matrix_type = MuonAdaptor
-            print(self.matrix_type)
+            # print(self.matrix_type)
 
     def __matrix_data_type(self):
         if self.location.path.endswith(".h5ad"):

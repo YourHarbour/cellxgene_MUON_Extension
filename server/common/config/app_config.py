@@ -33,8 +33,14 @@ class AppConfig(object):
         # Set to true when config_completed is called
         self.is_completed = False
 
+        # ATAC track config
+        self.atac_track_config = "None"
+
     def get_dataset_config(self):
         return self.dataset_config
+
+    def get_atac_track_config(self):
+        return self.atac_track_config
 
     def check_config(self):
         """Verify all the attributes in the config have been type checked"""
@@ -51,6 +57,9 @@ class AppConfig(object):
     def update_dataset_config(self, **kw):
         self.dataset_config.update(**kw)
         self.is_complete = False
+
+    def update_atac_track_config(self, path):
+        self.atac_track_config = path
 
     def update_single_config_from_path_and_value(self, path, value):
         """Update a single config parameter with the value.

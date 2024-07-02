@@ -11,6 +11,7 @@ import Subset from "./subset";
 import UndoRedoReset from "./undoRedo";
 import DiffexpButtons from "./diffexpButtons";
 import { getEmbSubsetView } from "../../util/stateManager/viewStackHelpers";
+import ExtensionController from "../extensionModule/extensionController";
 
 @connect((state) => {
   const { annoMatrix } = state;
@@ -313,6 +314,7 @@ class MenuBar extends React.PureComponent {
           handleSubsetReset={this.handleSubsetReset}
         />
         {disableDiffexp ? null : <DiffexpButtons />}
+        <ExtensionController />
       </div>
     );
   }

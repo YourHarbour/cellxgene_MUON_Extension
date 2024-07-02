@@ -9,7 +9,7 @@ from flask import (
     render_template,
     Blueprint,
     request,
-    send_from_directory,
+    send_from_directory, send_file,
 )
 from flask_restful import Api, Resource
 
@@ -74,6 +74,11 @@ def dataset_index():
             e.status_code, f"Invalid dataset: {e.message}", loglevel=logging.INFO, include_exc_info=True
         )
 
+@webbp.route("/get_atac_tracks", methods=["GET"])
+def get_atac_tracks():
+    app_config = current_app.app_config
+    atac_track_path = "../../" + app_config.get_atac_track_config()
+    return send_file(atac_track_path)
 
 @webbp.errorhandler(RequestException)
 def handle_request_exception(error):
@@ -113,7 +118,6 @@ class ConfigAPI(Resource):
     @rest_get_data_adaptor
     def get(self, data_adaptor):
         return common_rest.config_get(current_app.app_config, data_adaptor)
-
 
 class AnnotationsObsAPI(Resource):
     @cache_control(public=True, max_age=ONE_WEEK)
@@ -198,6 +202,7 @@ def get_api_base_resources(bp_base):
     # Diagnostics routes
     api.add_resource(HealthAPI, "/health")
     return api
+
 
 
 def get_api_dataroot_resources(bp_dataroot):

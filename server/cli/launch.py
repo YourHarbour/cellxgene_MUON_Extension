@@ -222,6 +222,7 @@ def launch_args(func):
     @dataset_args
     @server_args
     @click.argument("datapath", required=False, metavar="<path to data file>")
+    @click.option("--atac_track", "-atac", default="None", metavar="<path to atac>")
     @click.option(
         "--open",
         "-o",
@@ -303,6 +304,7 @@ class CliLaunchServer(Server):
 @launch_args
 def launch(
     datapath,
+    atac_track,
     verbose,
     debug,
     open_browser,
@@ -357,6 +359,8 @@ def launch(
         if config_file:
             app_config.update_from_config_file(config_file)
 
+        print(datapath)
+        print(atac_track)
         # Determine which config options were give on the command line.
         # Those will override the ones provided in the config file (if provided).
         cli_config = AppConfig()
@@ -395,6 +399,8 @@ def launch(
         diff = cli_config.dataset_config.changes_from_default()
         changes = {key: val for key, val, _ in diff}
         app_config.update_dataset_config(**changes)
+
+        app_config.update_atac_track_config(atac_track)
 
         # process the configuration
         #  any errors will be thrown as an exception.

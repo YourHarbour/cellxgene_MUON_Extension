@@ -19,7 +19,7 @@ def get_client_config(app_config, data_adaptor):
     # display_names
     title = app_config.get_title(data_adaptor)
     about = app_config.get_about(data_adaptor)
-
+    atac_track = app_config.get_atac_track_config()
     display_names = dict(engine=data_adaptor.get_name(), dataset=title)
 
     # library_versions
@@ -77,5 +77,6 @@ def get_client_config(app_config, data_adaptor):
         "column_request_max": server_config.limits__column_request_max,
         "diffexp_cellcount_max": server_config.limits__diffexp_cellcount_max,
     }
+    config["atac_track"] = atac_track
 
     return client_config

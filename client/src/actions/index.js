@@ -230,6 +230,7 @@ const requestDifferentialExpression =
   };
 
 function fetchJson(pathAndQuery) {
+  console.log(`${globals.API.prefix}${globals.API.version}${pathAndQuery}`)
   return doJsonRequest(
     `${globals.API.prefix}${globals.API.version}${pathAndQuery}`
   );
