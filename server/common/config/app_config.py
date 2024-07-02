@@ -58,21 +58,24 @@ class AppConfig(object):
         self.dataset_config.update(**kw)
         self.is_complete = False
 
-    def update_atac_track_config(self, path):
-        source_dir = path
-        dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + 'data.bw'
-        cmd = "cp %s %s" % (source_dir, dest_dir)
-        os.system(cmd)
-        self.atac_track_config = 'data.bw'
+    # def update_atac_track_config(self, path):
+    #     source_dir = path
+    #     dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + 'data.bw'
+    #     cmd = "cp %s %s" % (source_dir, dest_dir)
+    #     os.system(cmd)
+    #     self.atac_track_config = 'data.bw'
 
     def update_atac_track_config_u(self, path):
-        source_dir = path
-        dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '/../../app/data.bw'
-        print(source_dir)
-        print(dest_dir)
-        cmd = "cp %s %s" % (source_dir, dest_dir)
-        os.system(cmd)
-        self.atac_track_config = 'data.bw'
+        if path == 'None':
+            self.atac_track_config = 'None'
+        else:
+            source_dir = path
+            dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '/../../app/data.bw'
+            print(source_dir)
+            print(dest_dir)
+            cmd = "cp %s %s" % (source_dir, dest_dir)
+            os.system(cmd)
+            self.atac_track_config = 'data.bw'
 
     def update_single_config_from_path_and_value(self, path, value):
         """Update a single config parameter with the value.
