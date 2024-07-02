@@ -58,13 +58,19 @@ class AppConfig(object):
         self.dataset_config.update(**kw)
         self.is_complete = False
 
-    # def update_atac_track_config(self, path):
-    #     source_dir = path
-    #     dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + 'data.bw'
-    #     cmd = "cp %s %s" % (source_dir, dest_dir)
-    #     os.system(cmd)
-    #     self.atac_track_config = 'data.bw'
 
+    # for apple
+    def update_atac_track_config(self, path):
+        if path == 'None':
+            self.atac_track_config = 'None'
+        else:
+            source_dir = path
+            dest_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + 'data.bw'
+            cmd = "cp %s %s" % (source_dir, dest_dir)
+            os.system(cmd)
+            self.atac_track_config = 'data.bw'
+
+    # for linux
     def update_atac_track_config_u(self, path):
         if path == 'None':
             self.atac_track_config = 'None'

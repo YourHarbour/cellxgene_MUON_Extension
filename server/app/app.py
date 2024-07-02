@@ -82,7 +82,7 @@ def get_atac_tracks():
     atac_track_path = "../../" + app_config.get_atac_track_config()
     return send_file(atac_track_path)
 
-@webbp.route("/get_atac_tracks_1", methods=["GET"])
+@webbp.route("/get_atac_tracks_apple", methods=["GET"])
 def get_atac_tracks_1():
     file_dir = os.path.abspath(os.path.join(os.path.dirname(__file__))) + '/data.bw'
     print(file_dir)
