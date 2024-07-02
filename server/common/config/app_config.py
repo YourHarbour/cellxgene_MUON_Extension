@@ -65,6 +65,15 @@ class AppConfig(object):
         os.system(cmd)
         self.atac_track_config = 'data.bw'
 
+    def update_atac_track_config_u(self, path):
+        source_dir = path
+        dest_dir = os.path.abspath(os.getcwd()) + '/data.bw'
+        print(source_dir)
+        print(dest_dir)
+        cmd = "cp %s %s" % (source_dir, dest_dir)
+        os.system(cmd)
+        self.atac_track_config = 'data.bw'
+
     def update_single_config_from_path_and_value(self, path, value):
         """Update a single config parameter with the value.
         Path is a list of string, that gives a path to the config parameter to be updated.
