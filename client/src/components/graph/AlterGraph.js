@@ -563,10 +563,14 @@ class AlterGraph extends React.Component {
       pointDilation
     );
 
+    // console.log(layoutDf, colorDf, pointDilationDf);
+
     const { currentDimNames } = layoutChoice;
     const X = layoutDf.col(currentDimNames[0]).asArray();
     const Y = layoutDf.col(currentDimNames[1]).asArray();
     const positions = this.computePointPositions(X, Y, modelTF);
+    // console.log('poss');
+    // console.log(positions);
 
     const colorTable = this.updateColorTable(colorsProp, colorDf);
     const colors = this.computePointColors(colorTable.rgb);
@@ -580,6 +584,7 @@ class AlterGraph extends React.Component {
     const pointDilationData = pointDilationDf
       ?.col(pointDilationCategory)
       ?.asArray();
+    console.log(pointDilationData)
     const flags = this.computePointFlags(
       crossfilter,
       colorByData,
@@ -624,6 +629,8 @@ class AlterGraph extends React.Component {
     } else {
       promises.push(Promise.resolve(null));
     }
+    console.log('annomatrix')
+    console.log(annoMatrix)
 
     return Promise.all(promises);
   }
@@ -787,6 +794,7 @@ class AlterGraph extends React.Component {
       needToRenderCanvas = true;
     }
     if (flags !== prevAsyncProps?.flags) {
+      console.log(flags)
       flagBuffer({ data: flags, dimension: 1 });
       needToRenderCanvas = true;
     }

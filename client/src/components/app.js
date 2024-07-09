@@ -42,7 +42,7 @@ class App extends React.Component {
 
   render() {
     const { loading, error, graphRenderCounter, config } = this.props;
-    console.log(config)
+    // console.log(config)
     return (
       <Container>
         <Helmet title="CELL&times;GENE | Annotate" />

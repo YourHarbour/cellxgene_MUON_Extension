@@ -32,7 +32,7 @@ class EmbeddingAlter extends React.PureComponent {
   };
 
   render() {
-      console.log(this.props);
+      // console.log(this.props);
     const { layoutChoice, schema, crossfilter } = this.props;
     const { annoMatrix } = crossfilter;
     return (
