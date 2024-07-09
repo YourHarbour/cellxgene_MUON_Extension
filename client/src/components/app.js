@@ -13,16 +13,19 @@ import Autosave from "./autosave";
 import Embedding from "./embedding";
 
 import actions from "../actions";
+import MultiLayout from "./framework/multiLayout";
+import AlterGraph from "./graph/AlterGraph";
+import EmbeddingAlter from "./embedding/inexAlter";
 
 @connect((state) => ({
   loading: state.controls.loading,
   error: state.controls.error,
   graphRenderCounter: state.controls.graphRenderCounter,
+  config: state.config
 }))
 class App extends React.Component {
   componentDidMount() {
     const { dispatch } = this.props;
-
     /* listen for url changes, fire one when we start the app up */
     window.addEventListener("popstate", this._onURLChanged);
     this._onURLChanged();
@@ -38,7 +41,8 @@ class App extends React.Component {
   }
 
   render() {
-    const { loading, error, graphRenderCounter } = this.props;
+    const { loading, error, graphRenderCounter, config } = this.props;
+    console.log(config)
     return (
       <Container>
         <Helmet title="CELL&times;GENE | Annotate" />
@@ -67,6 +71,26 @@ class App extends React.Component {
           </div>
         ) : null}
         {loading || error ? null : (
+            config.displayNames.engine === "Muon Adaptor" ? <MultiLayout>
+              <LeftSideBar />
+              {(viewportRef) => (
+              <>
+                <MenuBar />
+                <Embedding />
+                <Autosave />
+                <Legend viewportRef={viewportRef} />
+                <Graph key={graphRenderCounter} viewportRef={viewportRef} />
+              </>
+            )}
+              {(viewportRef) => (
+                <>
+                  <EmbeddingAlter />
+                  <Legend viewportRef={viewportRef} />
+                  <AlterGraph key={1} viewportRef={viewportRef} currentDisplayWindow={1}/>
+                </>
+              )}
+              <RightSideBar />
+            </MultiLayout> :
           <Layout>
             <LeftSideBar />
             {(viewportRef) => (

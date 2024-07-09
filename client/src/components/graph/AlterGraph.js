@@ -67,18 +67,33 @@ function createModelTF() {
   return m;
 }
 
-@connect((state) => ({
-  annoMatrix: state.annoMatrix,
-  crossfilter: state.obsCrossfilter,
-  selectionTool: state.graphSelection.tool,
-  currentSelection: state.graphSelection.selection,
-  layoutChoice: state.layoutChoice,
-  graphInteractionMode: state.controls.graphInteractionMode,
-  colors: state.colors,
-  pointDilation: state.pointDilation,
-  genesets: state.genesets.genesets,
-}))
-class Graph extends React.Component {
+// @connect((state) => ({
+//   annoMatrix: state.annoMatrixAlter,
+//   crossfilter: state.obsCrossfilterAlter,
+//   selectionTool: state.graphSelection.tool,
+//   currentSelection: state.graphSelection.selection,
+//   layoutChoice: state.layoutChoiceAlter,
+//   graphInteractionMode: state.controls.graphInteractionMode,
+//   colors: state.colors,
+//   pointDilation: state.pointDilation,
+//   genesets: state.genesets.genesets,
+// }))
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    annoMatrix: ownProps.currentDisplayWindow === 1 ? state.annoMatrixAlter : state.annoMatrix,
+    crossfilter: ownProps.currentDisplayWindow === 1 ? state.obsCrossfilterAlter : state.obsCrossfilter,
+    selectionTool: state.graphSelection.tool,
+    currentSelection: state.graphSelection.selection,
+    layoutChoice: ownProps.currentDisplayWindow === 1 ? state.layoutChoiceAlter : state.layoutChoice,
+    graphInteractionMode: state.controls.graphInteractionMode,
+    colors: state.colors,
+    pointDilation: state.pointDilation,
+    genesets: state.genesets.genesets
+  };
+};
+
+class AlterGraph extends React.Component {
   static createReglState(canvas) {
     /*
     Must be created for each canvas
@@ -210,6 +225,7 @@ class Graph extends React.Component {
 
   constructor(props) {
     super(props);
+    console.log(props);
     const viewport = this.getViewportDimensions();
     this.reglCanvas = null;
     this.cachedAsyncProps = null;
@@ -299,6 +315,23 @@ class Graph extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.handleResize);
+    console.log('unmount');
+    this.reglCanvas = null;
+    // if (this.reglCanvas) {
+    //   this.reglCanvas.parentNode.removeChild(this.reglCanvas);
+    // }
+      const canvases = document.getElementsByTagName('canvas');
+      const canvasArray = Array.from(canvases);
+      canvasArray.forEach(canvas => {
+        console.log(canvas)
+        if (canvas.parentNode && canvas.id !== 'main-canvas') {
+          canvas.parentNode.removeChild(canvas);
+        }
+      });
+
+      if (this.state.regl) {
+        this.state.regl.destroy();
+      }
   }
 
   handleResize = () => {
@@ -310,12 +343,14 @@ class Graph extends React.Component {
       viewport,
       projectionTF,
     });
+    console.log('resize called')
   };
 
   handleCanvasEvent = (e) => {
     const { camera, projectionTF } = this.state;
     if (e.type !== "wheel") e.preventDefault();
     if (camera.handleEvent(e, projectionTF)) {
+      console.log('render called');
       this.renderCanvas();
       this.setState((state) => ({ ...state, updateOverlay: !state.updateOverlay }));
     }
@@ -446,8 +481,9 @@ class Graph extends React.Component {
   setReglCanvas = (canvas) => {
     this.reglCanvas = canvas;
     this.setState({
-      ...Graph.createReglState(canvas),
+      ...AlterGraph.createReglState(canvas),
     });
+    console.log(this.state)
   };
 
   getViewportDimensions = () => {
@@ -890,11 +926,11 @@ class Graph extends React.Component {
           onMouseMove={this.handleCanvasEvent}
           onDoubleClick={this.handleCanvasEvent}
           onWheel={this.handleCanvasEvent}
-          id={'main-canvas'}
+          id = 'alter-canvas'
         />
 
         <Async
-          watchFn={Graph.watchAsync}
+          watchFn={AlterGraph.watchAsync}
           promiseFn={this.fetchAsyncProps}
           watchProps={{
             annoMatrix,
@@ -952,7 +988,7 @@ const ErrorLoading = ({ displayName, error, width, height }) => {
   );
 };
 
-const StillLoading = ({ displayName, width, height }) => 
+const StillLoading = ({ displayName, width, height }) =>
   /*
   Render a busy/loading indicator
   */
@@ -980,4 +1016,4 @@ const StillLoading = ({ displayName, width, height }) =>
   )
 ;
 
-export default Graph;
+export default connect(mapStateToProps)(AlterGraph);

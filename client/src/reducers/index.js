@@ -22,6 +22,9 @@ import pointDialation from "./pointDilation";
 import { gcMiddleware as annoMatrixGC } from "../annoMatrix";
 
 import undoableConfig from "./undoableConfig";
+import annoMatrixAlter from "./annoMatrixAlter";
+import obsCrossfilterAlter from "./obsCrossfilterAlter";
+import layoutChoiceAlter from "./layoutChoiceAlter";
 
 const Reducer = undoable(
   cascadeReducers([
@@ -41,10 +44,15 @@ const Reducer = undoable(
     ["centroidLabels", centroidLabels],
     ["pointDilation", pointDialation],
     ["autosave", autosave],
+      ["annoMatrixAlter", annoMatrixAlter],
+      ["obsCrossfilterAlter", obsCrossfilterAlter],
+      ["layoutChoiceAlter", layoutChoiceAlter],
   ]),
   [
     "annoMatrix",
     "obsCrossfilter",
+    "annoMatrixAlter",
+    "obsCrossfilterAlter",
     "categoricalSelection",
     "continuousSelection",
     "graphSelection",
@@ -52,6 +60,7 @@ const Reducer = undoable(
     "controls",
     "differential",
     "layoutChoice",
+    "layoutChoiceAlter",
     "centroidLabels",
     "genesets",
     "annotations",

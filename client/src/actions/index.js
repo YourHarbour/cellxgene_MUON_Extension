@@ -22,6 +22,20 @@ function setGlobalConfig(config) {
     globals.globalConfig.maxCategoricalOptionsToDisplay;
 }
 
+export function obsCrossfilterAlterAction(obsCrossfilter) {
+  return {
+    type: "obsCrossfilterAlter",
+    obsCrossfilter,
+  };
+}
+
+export function layoutChoiceAlterAction(layoutChoice) {
+  return {
+    type: "layoutChoiceAlter",
+    layoutChoice,
+  };
+}
+
 /*
 return promise fetching user-configured colors
 */
@@ -103,11 +117,25 @@ const doInitialDataLoad = () =>
       const obsCrossfilter = new AnnoMatrixObsCrossfilter(annoMatrix);
       prefetchEmbeddings(annoMatrix);
 
+      const annoMatrixAlter = new AnnoMatrixLoader(baseDataUrl, schema.schema);
+      const obsCrossfilterAlter = new AnnoMatrixObsCrossfilter(annoMatrix);
+
       dispatch({
         type: "annoMatrix: init complete",
         annoMatrix,
         obsCrossfilter,
       });
+
+      dispatch({
+        type: "annoMatrixAlter",
+        annoMatrixAlter,
+        obsCrossfilterAlter,
+      })
+
+      // dispatch(obsCrossfilterAlterAction(obsCrossfilter));
+      // dispatch({
+      //   type:""
+      // })
       dispatch({ type: "initial data load complete" });
 
       const defaultEmbedding = config?.parameters?.default_embedding;
@@ -117,6 +145,7 @@ const doInitialDataLoad = () =>
         layoutSchema.some((s) => s.name === defaultEmbedding)
       ) {
         dispatch(embActions.layoutChoiceAction(defaultEmbedding));
+        dispatch(embActions.multiDisplayLayoutChoiceAction(defaultEmbedding));
       }
     } catch (error) {
       dispatch({ type: "initial data load error", error });
@@ -269,6 +298,7 @@ export default {
   saveGenesetsAction: annoActions.saveGenesetsAction,
   needToSaveObsAnnotations: annoActions.needToSaveObsAnnotations,
   layoutChoiceAction: embActions.layoutChoiceAction,
+  multiDisplayLayoutChoiceAction: embActions.multiDisplayLayoutChoiceAction,
   setCellSetFromSelection: selnActions.setCellSetFromSelection,
   genesetDelete: genesetActions.genesetDelete,
   genesetAddGenes: genesetActions.genesetAddGenes,

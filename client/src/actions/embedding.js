@@ -15,6 +15,7 @@ export async function _switchEmbedding(
   */
   const base = prevAnnoMatrix.base();
   const embeddingDf = await base.fetch("emb", newEmbeddingName);
+  // console.log(base)
   const annoMatrix = _setEmbeddingSubset(prevAnnoMatrix, embeddingDf);
   const obsCrossfilter = await new AnnoMatrixObsCrossfilter(
     annoMatrix,
@@ -45,3 +46,25 @@ export const layoutChoiceAction =
       annoMatrix,
     });
   };
+
+export const multiDisplayLayoutChoiceAction =
+  (newLayoutChoice) => async (dispatch, getState) => {
+    /*
+  On layout choice, make sure we have selected all on the previous layout, AND the new
+  layout.
+  */
+    const { annoMatrixAlter: prevAnnoMatrix, obsCrossfilterAlter: prevCrossfilter } =
+      getState();
+    const [annoMatrix, obsCrossfilter] = await _switchEmbedding(
+      prevAnnoMatrix,
+      prevCrossfilter,
+      newLayoutChoice
+    );
+    dispatch({
+      type: "set layout multi",
+      layoutChoiceAlter: newLayoutChoice,
+      obsCrossfilterAlter: obsCrossfilter,
+      annoMatrixAlter: annoMatrix,
+    });
+  };
+

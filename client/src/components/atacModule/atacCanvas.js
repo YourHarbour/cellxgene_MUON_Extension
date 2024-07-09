@@ -17,7 +17,7 @@ const ATACCanvas = () => {
             tracks: [
                 {
                     name: "BigWig",
-                    url: "http://localhost:5005/get_atac_tracks",
+                    url: "http://localhost:5005/get_atac_tracks_apple",
                     color: "rgb(0,100,0)",
                     type: "wig",
                     format: "bigwig"

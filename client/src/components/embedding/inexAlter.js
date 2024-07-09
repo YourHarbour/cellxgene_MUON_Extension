@@ -16,11 +16,11 @@ import actions from "../../actions";
 import { getDiscreteCellEmbeddingRowIndex } from "../../util/stateManager/viewStackHelpers";
 
 @connect((state) => ({
-    layoutChoice: state.layoutChoice, // TODO: really should clean up naming, s/layout/embedding/g
-    schema: state.annoMatrix?.schema,
-    crossfilter: state.obsCrossfilter,
+    layoutChoice: state.layoutChoiceAlter,
+    schema: state.annoMatrixAlter?.schema,
+    crossfilter: state.obsCrossfilterAlter,
   }))
-class Embedding extends React.PureComponent {
+class EmbeddingAlter extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {};
@@ -28,7 +28,7 @@ class Embedding extends React.PureComponent {
 
   handleLayoutChoiceChange = (e) => {
     const { dispatch } = this.props;
-    dispatch(actions.layoutChoiceAction(e.currentTarget.value));
+    dispatch(actions.multiDisplayLayoutChoiceAction(e.currentTarget.value));
   };
 
   render() {
@@ -97,7 +97,7 @@ class Embedding extends React.PureComponent {
   }
 }
 
-export default Embedding;
+export default EmbeddingAlter;
 
 const loadAllEmbeddingCounts = async ({ annoMatrix, available }) => {
   const embeddings = await Promise.all(
@@ -123,7 +123,6 @@ const EmbeddingChoices = ({ onChange, annoMatrix, layoutChoice }) => {
     console.error(error);
   }
   if (error || isPending) {
-    /* still loading, or errored out - just omit counts (TODO: spinner?) */
     return (
       <RadioGroup onChange={onChange} selectedValue={layoutChoice.current}>
         {layoutChoice.available.map((name) => (

@@ -21,7 +21,7 @@ function setToDefaultLayout(schema) {
   return { available, current, currentDimNames };
 }
 
-const LayoutChoice = (
+const LayoutChoiceAlter = (
   state = {
     available: [], // all available choices
     current: undefined, // name of the current layout, eg, 'umap'
@@ -34,17 +34,19 @@ const LayoutChoice = (
   switch (action.type) {
     case "initial data load complete": {
       // set default to default
-      const { annoMatrix } = nextSharedState;
+      const { annoMatrixAlter } = nextSharedState;
       console.log('init load');
       return {
         ...state,
-        ...setToDefaultLayout(annoMatrix.schema),
+        ...setToDefaultLayout(annoMatrixAlter.schema),
       };
     }
 
-    case "set layout choice": {
-      const { schema } = nextSharedState.annoMatrix;
-      const current = action.layoutChoice;
+    case "set layout multi": {
+      console.log(action)
+      console.log(nextSharedState)
+      const { schema } = nextSharedState.annoMatrixAlter;
+      const current = action.layoutChoiceAlter;
       console.log(current)
       const currentDimNames = schema.layout.obsByName[current].dims;
       return { ...state, current, currentDimNames };
@@ -56,4 +58,4 @@ const LayoutChoice = (
   }
 };
 
-export default LayoutChoice;
+export default LayoutChoiceAlter;

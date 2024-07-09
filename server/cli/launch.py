@@ -400,7 +400,9 @@ def launch(
         changes = {key: val for key, val, _ in diff}
         app_config.update_dataset_config(**changes)
 
-        #app_config.update_atac_track_config(atac_track)
+        # for apple
+        # app_config.update_atac_track_config(atac_track)
+        #for linux
         app_config.update_atac_track_config_u(atac_track)
 
         # process the configuration
