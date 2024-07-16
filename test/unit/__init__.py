@@ -89,6 +89,21 @@ def app_config(data_locator, backed=False, extra_server_config={}, extra_dataset
     config.complete_config()
     return config
 
+def muno_config(data_locator, backed=False, extra_server_config={}, extra_dataset_config={}):
+    config = AppConfig()
+    config.update_server_config(
+        app__flask_secret_key="secret",
+        single_dataset__obs_names=None,
+        single_dataset__var_names=None,
+        adaptor__anndata_adaptor__backed=backed,
+        single_dataset__datapath=data_locator,
+        limits__diffexp_cellcount_max=None,
+        limits__column_request_max=None,
+    )
+    config.update_server_config(**extra_server_config)
+    config.update_dataset_config(**extra_dataset_config)
+    config.complete_config()
+    return config
 
 def start_test_server(command_line_args=[], app_config=None, env=None):
     """
