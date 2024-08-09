@@ -82,11 +82,11 @@ class App extends React.Component {
                 <Graph key={graphRenderCounter} viewportRef={viewportRef} />
               </>
             )}
-              {(viewportRef) => (
+              {(viewportRef1) => (
                 <>
                   <EmbeddingAlter />
-                  <Legend viewportRef={viewportRef} />
-                  <AlterGraph key={1} viewportRef={viewportRef} currentDisplayWindow={1}/>
+                  <Legend viewportRef={viewportRef1} />
+                  <AlterGraph key={1} viewportRef={viewportRef1} currentDisplayWindow={1}/>
                 </>
               )}
               <RightSideBar />

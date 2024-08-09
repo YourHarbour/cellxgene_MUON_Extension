@@ -89,7 +89,8 @@ const mapStateToProps = (state, ownProps) => {
     graphInteractionMode: state.controls.graphInteractionMode,
     colors: state.colors,
     pointDilation: state.pointDilation,
-    genesets: state.genesets.genesets
+    genesets: state.genesets.genesets,
+    extraState: state.layoutChoice
   };
 };
 
@@ -429,25 +430,26 @@ class AlterGraph extends React.Component {
   }
 
   handleLassoStart() {
-    const { dispatch, layoutChoice } = this.props;
-    dispatch(actions.graphLassoStartAction(layoutChoice.current));
+    const { dispatch, extraState } = this.props;
+    console.log(extraState.current)
+    dispatch(actions.graphLassoStartAction(extraState.current));
   }
 
   // when a lasso is completed, filter to the points within the lasso polygon
   handleLassoEnd(polygon) {
     const minimumPolygonArea = 10;
-    const { dispatch, layoutChoice } = this.props;
-
+    const { dispatch, extraState } = this.props;
+    console.log(extraState.current)
     if (
       polygon.length < 3 ||
       Math.abs(d3.polygonArea(polygon)) < minimumPolygonArea
     ) {
       // if less than three points, or super small area, treat as a clear selection.
-      dispatch(actions.graphLassoDeselectAction(layoutChoice.current));
+      dispatch(actions.graphLassoDeselectAction(extraState.current));
     } else {
       dispatch(
         actions.graphLassoEndAction(
-          layoutChoice.current,
+          extraState.current,
           polygon.map((xy) => this.mapScreenToPoint(xy))
         )
       );
@@ -455,13 +457,13 @@ class AlterGraph extends React.Component {
   }
 
   handleLassoCancel() {
-    const { dispatch, layoutChoice } = this.props;
-    dispatch(actions.graphLassoCancelAction(layoutChoice.current));
+    const { dispatch, extraState } = this.props;
+    dispatch(actions.graphLassoCancelAction(extraState.current));
   }
 
   handleLassoDeselectAction() {
-    const { dispatch, layoutChoice } = this.props;
-    dispatch(actions.graphLassoDeselectAction(layoutChoice.current));
+    const { dispatch, extraState } = this.props;
+    dispatch(actions.graphLassoDeselectAction(extraState.current));
   }
 
   handleDeselectAction() {
