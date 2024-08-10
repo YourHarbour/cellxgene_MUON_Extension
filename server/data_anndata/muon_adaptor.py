@@ -154,7 +154,6 @@ class MuonAdaptor(DataAdaptor):
         merged = gex.copy()
         merged.obsm.update(atac.obsm)
 
-        # 合并 obs
         for col in atac.obs.columns:
             merged.obs[col] = atac.obs[col]
 
